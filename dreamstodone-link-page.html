@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DreamsToDone ✦ Planners that run in your browser</title>
+<meta name="description" content="Interactive planners and trackers that run in any browser and save on your own device. Pick a free planner and it is yours.">
+<meta name="theme-color" content="#F7F1E7">
+<meta property="og:title" content="DreamsToDone ✦ Pick a free planner">
+<meta property="og:description" content="Interactive planners that open in any browser and save on your own device. Choose one free.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,900&display=swap" rel="stylesheet">
+<style>
+  /* ---------------- tokens ---------------- */
+  :root{
+    --bg:#F7F1E7;
+    --bg2:#F1E6D8;
+    --card:#FFFFFF;
+    --line:#E6DCCE;
+    --ink:#241E2E;
+    --muted:#5E5570;
+    --gold:#8F6116;
+    --pink:#D22E80;
+    --teal:#2F7F72;
+    --violet:#5B3FC4;
+    --tint-gold:#FBEFD9;
+    --tint-pink:#FBE1EE;
+    --tint-teal:#DEF0EC;
+    --tint-violet:#E8E2FB;
+    --pick:#F3EFFD;
+    --btn-bg:#241E2E;
+    --btn-fg:#FFF8EC;
+    --focus:#5B3FC4;
+    --bar-bg:rgba(247,241,231,.92);
+    --shadow:0 1px 0 rgba(36,30,46,.05), 0 8px 24px rgba(36,30,46,.07);
+    --radius:18px;
+  }
+  html[data-theme="dark"]{
+    --bg:#15121D;
+    --bg2:#1C1826;
+    --card:#262131;
+    --line:#393346;
+    --ink:#F4F0FA;
+    --muted:#B0A8BE;
+    --gold:#F0BE68;
+    --pink:#F97CBB;
+    --teal:#7FD0C1;
+    --violet:#A892F7;
+    --tint-gold:rgba(240,190,104,.16);
+    --tint-pink:rgba(249,124,187,.16);
+    --tint-teal:rgba(127,208,193,.16);
+    --tint-violet:rgba(168,146,247,.18);
+    --pick:rgba(168,146,247,.14);
+    --btn-bg:#7C5CF0;
+    --btn-fg:#FFFFFF;
+    --focus:#A892F7;
+    --bar-bg:rgba(21,18,29,.92);
+    --shadow:0 1px 0 rgba(0,0,0,.2), 0 10px 28px rgba(0,0,0,.35);
+  }
+
+  /* ---------------- base ---------------- */
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    font-family:Inter,"Helvetica Neue",Helvetica,Arial,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    color:var(--ink);
+    background:var(--bg);
+    background-image:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
+    background-repeat:no-repeat;
+    min-height:100vh;
+    min-height:100dvh;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    -webkit-tap-highlight-color:transparent;
+  }
+  a,button,input,label{font-family:inherit;touch-action:manipulation}
+  a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .wrap{
+    width:100%;
+    max-width:540px;
+    margin:0 auto;
+    padding:22px 18px calc(108px + env(safe-area-inset-bottom));
+  }
+
+  /* ---------------- header ---------------- */
+  .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+  .mark{
+    margin:0;
+    font-family:Fraunces,Georgia,"Times New Roman",serif;
+    font-variation-settings:"opsz" 144,"SOFT" 60,"WONK" 18;
+    font-weight:900;font-size:22px;line-height:1.15;letter-spacing:-.01em;
+  }
+  .mark .sp{color:var(--gold)}
+  .iconbtn{
+    width:48px;height:48px;flex:0 0 48px;
+    display:flex;align-items:center;justify-content:center;
+    line-height:1;padding:0;margin:0;
+    border:1px solid var(--line);border-radius:15px;
+    background:var(--card);color:var(--ink);
+    cursor:pointer;box-shadow:var(--shadow);
+    transition:transform .12s ease;
+  }
+  .iconbtn:active{transform:scale(.94)}
+  .iconbtn svg{display:block;width:21px;height:21px}
+  .iconbtn .sun{display:none}
+  html[data-theme="dark"] .iconbtn .sun{display:block}
+  html[data-theme="dark"] .iconbtn .moon{display:none}
+
+  /* ---------------- hero ---------------- */
+  .hero{margin:0 0 20px}
+  .hero h1{
+    margin:0 0 8px;
+    font-size:clamp(25px,6.6vw,31px);
+    font-weight:800;line-height:1.18;letter-spacing:-.022em;
+  }
+  .hero h1 em{font-style:normal;color:var(--violet)}
+  .hero p{margin:0;max-width:34ch;font-size:16px;color:var(--muted)}
+
+  /* ---------------- giveaway card ---------------- */
+  .give{
+    position:relative;overflow:hidden;
+    padding:22px 18px;margin-bottom:30px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:22px;
+    box-shadow:var(--shadow);
+  }
+  .give:before{
+    content:"";position:absolute;top:0;left:0;right:0;height:5px;
+    background-image:linear-gradient(90deg,#E0A94A,#D8407F 55%,#6B4BD6);
+  }
+  .tag{
+    display:inline-block;margin:4px 0 8px;
+    font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--gold);
+  }
+  .give h2{margin:0 0 8px;font-size:21px;font-weight:800;line-height:1.24;letter-spacing:-.015em}
+  .give .lede{margin:0 0 16px;font-size:15px;color:var(--muted)}
+
+  fieldset{border:0;margin:0 0 14px;padding:0}
+  legend{
+    padding:0;margin:0 0 9px;
+    font-size:13px;font-weight:700;color:var(--ink);
+  }
+  .picks{display:flex;flex-direction:column;gap:9px}
+  .pick{
+    display:flex;align-items:center;gap:13px;
+    min-height:66px;padding:12px 14px;
+    border:1.5px solid var(--line);border-radius:15px;
+    background:var(--bg);
+    cursor:pointer;
+    transition:border-color .12s ease,background .12s ease;
+  }
+  .pick input{
+    width:22px;height:22px;flex:0 0 22px;margin:0;
+    accent-color:var(--violet);
+    cursor:pointer;
+  }
+  .pick .pt{display:block;font-weight:650;font-size:15.5px;line-height:1.3}
+  .pick .pn{display:block;margin-top:1px;font-size:13px;line-height:1.35;color:var(--muted)}
+  .pick:has(input:checked){border-color:var(--violet);background:var(--pick)}
+  .pick:focus-within{outline:3px solid var(--focus);outline-offset:2px}
+
+  form{margin:0}
+  input[type=email]{
+    width:100%;min-height:52px;padding:14px 15px;
+    font-size:16px;color:var(--ink);
+    background:var(--bg);
+    border:1.5px solid var(--line);border-radius:14px;
+    -webkit-appearance:none;appearance:none;
+  }
+  input[type=email]::placeholder{color:var(--muted);opacity:.9}
+  input[type=email].bad{border-color:var(--pink)}
+
+  .consent{
+    display:flex;align-items:flex-start;gap:11px;
+    margin:14px 0 4px;padding:11px 12px;
+    border:1.5px solid var(--line);border-radius:14px;
+    background:var(--bg);
+    cursor:pointer;
+  }
+  .consent input{
+    width:22px;height:22px;flex:0 0 22px;margin:1px 0 0;
+    accent-color:var(--violet);cursor:pointer;
+  }
+  .consent span{font-size:13.5px;line-height:1.45;color:var(--muted)}
+  .consent.bad{border-color:var(--pink)}
+  .consent:focus-within{outline:3px solid var(--focus);outline-offset:2px}
+
+  .btn{
+    display:flex;align-items:center;justify-content:center;
+    width:100%;min-height:54px;margin-top:12px;
+    padding:14px 18px;
+    font-size:16px;font-weight:700;
+    color:var(--btn-fg);background:var(--btn-bg);
+    border:none;border-radius:14px;cursor:pointer;
+    -webkit-appearance:none;appearance:none;
+    transition:transform .12s ease;
+  }
+  .btn:active{transform:translateY(1px)}
+  .fineprint{margin:11px 0 0;font-size:12.5px;line-height:1.45;color:var(--muted);text-align:center}
+  .formnote{
+    margin:12px 0 0;padding:11px 13px;
+    font-size:12.5px;line-height:1.45;
+    background:var(--tint-gold);border-radius:12px;color:var(--ink);
+  }
+  .done{display:none;padding:8px 0 2px;text-align:center}
+  .done strong{display:block;margin-bottom:5px;font-size:19px;font-weight:800}
+  .done span{font-size:14px;color:var(--muted)}
+  .give.sent form,.give.sent .fineprint,.give.sent .lede,.give.sent .formnote{display:none}
+  .give.sent .done{display:block}
+
+  /* ---------------- link list ---------------- */
+  .sectitle{
+    margin:0 0 12px 2px;
+    font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  }
+  .links{list-style:none;margin:0 0 26px;padding:0;display:flex;flex-direction:column;gap:10px}
+  .link{
+    display:flex;align-items:center;gap:14px;
+    min-height:72px;padding:14px 16px;
+    background:var(--card);
+    border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    color:var(--ink);text-decoration:none;
+    transition:transform .12s ease,border-color .12s ease;
+  }
+  .link:active{transform:translateY(1px)}
+  @media (hover:hover){.link:hover{border-color:var(--violet)}}
+  .dot{
+    width:44px;height:44px;flex:0 0 44px;
+    display:flex;align-items:center;justify-content:center;
+    line-height:1;padding:0;font-size:21px;
+    border-radius:14px;background:var(--tint-violet);
+  }
+  .dot.gold{background:var(--tint-gold)}
+  .dot.pink{background:var(--tint-pink)}
+  .dot.teal{background:var(--tint-teal)}
+  .dot.violet{background:var(--tint-violet)}
+  .txt{flex:1;min-width:0}
+  .t{display:block;font-weight:650;font-size:16px;line-height:1.3;letter-spacing:-.01em}
+  .n{display:block;margin-top:2px;font-size:13.5px;line-height:1.4;color:var(--muted)}
+  .arrow{flex:0 0 20px;display:flex;align-items:center;justify-content:center;line-height:1;color:var(--muted)}
+  .arrow svg{display:block;width:20px;height:20px}
+
+  /* ---------------- footer ---------------- */
+  footer{text-align:center;font-size:13.5px;color:var(--muted)}
+  footer p{margin:0}
+  footer a{display:inline-block;padding:8px 2px;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+  .sparkle{color:var(--gold)}
+
+  /* ---------------- sticky shop bar ---------------- */
+  .shopbar{
+    position:fixed;left:0;right:0;bottom:0;z-index:20;
+    padding:10px 18px calc(10px + env(safe-area-inset-bottom));
+    background:var(--bar-bg);
+    border-top:1px solid var(--line);
+  }
+  @supports ((backdrop-filter:blur(8px)) or (-webkit-backdrop-filter:blur(8px))){
+    .shopbar{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  }
+  .shopbar a{
+    display:flex;align-items:center;justify-content:center;gap:9px;
+    width:100%;max-width:504px;margin:0 auto;
+    min-height:52px;padding:12px 18px;
+    font-size:16px;font-weight:700;
+    color:#FFFFFF;text-decoration:none;
+    background-color:#5E3FC9;
+    background-image:linear-gradient(135deg,#5E3FC9 0%,#9B3399 58%,#C8366F 100%);
+    border-radius:14px;
+    box-shadow:0 6px 18px rgba(94,63,201,.28);
+    transition:transform .12s ease;
+  }
+  .shopbar a:active{transform:translateY(1px)}
+  .shopbar svg{display:block;width:18px;height:18px;flex:0 0 18px}
+
+  @media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+  @media print{body{background:#fff}.iconbtn,.shopbar{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <p class="mark">DreamsToDone <span class="sp">&#10022;</span></p>
+    <button class="iconbtn" id="themeBtn" type="button" aria-label="Switch between light and dark">
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/></svg>
+    </button>
+  </header>
+
+  <div class="hero">
+    <h1>Planners that <em>actually run</em> on your phone</h1>
+    <p>Open them in any browser and your notes save on your own device.</p>
+  </div>
+
+  <!-- ===========================================================
+       THE GIVEAWAY. To change which two planners are offered,
+       edit the two .pick labels below and their value="" strings.
+       =========================================================== -->
+  <div class="give" id="give">
+    <span class="tag">Yours free</span>
+    <h2>Pick a planner and it is yours, free</h2>
+    <p class="lede">A full planner, not a sample. The same file people buy in my shop. Choose the one you want and I will send it over.</p>
+
+    <form id="giveForm" novalidate>
+      <fieldset>
+        <legend>Which one would you like?</legend>
+        <div class="picks">
+
+          <label class="pick">
+            <input type="radio" name="gift" value="Gamified Chores Tracker" checked>
+            <span class="txt">
+              <span class="pt">Gamified Chores Tracker</span>
+              <span class="pn">Turn the housework into levels and streaks</span>
+            </span>
+          </label>
+
+          <label class="pick">
+            <input type="radio" name="gift" value="Student Planner">
+            <span class="txt">
+              <span class="pt">Student Planner</span>
+              <span class="pn">Classes, deadlines and revision in one page</span>
+            </span>
+          </label>
+
+        </div>
+      </fieldset>
+
+      <input type="email" id="email" name="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@email.com" aria-label="Your email address" required>
+
+      <label class="consent" id="consentRow">
+        <input type="checkbox" id="consent" name="consent" value="yes" required>
+        <span>Yes, send me my planner and keep me posted about new tools, offers and tips from DreamsToDone. I can unsubscribe any time.</span>
+      </label>
+
+      <button class="btn" type="submit">Send me my free planner</button>
+    </form>
+
+    <p class="fineprint">Your planner arrives by email in a minute or two.</p>
+
+    <div class="done" role="status" aria-live="polite">
+      <strong>On its way <span class="sparkle">&#10022;</span></strong>
+      <span>Open the email and confirm, then your planner lands in your inbox. If you cannot see it, have a peek in spam.</span>
+    </div>
+  </div>
+
+  <!-- ===========================================================
+       YOUR LINKS. Paste each Etsy listing URL into its href.
+       Leave the shop URL in place and the link goes to your shop.
+       Icon tints: gold, pink, teal, violet.
+       =========================================================== -->
+  <p class="sectitle">The tools</p>
+  <ul class="links">
+
+    <li><a class="link" href="https://dreamstodone.etsy.com" target="_blank" rel="noopener">
+      <span class="dot teal" aria-hidden="true">&#129348;</span>
+      <span class="txt"><span class="t">Spoonie Pacing Tracker</span><span class="n">Track your energy day by day and see the pattern</span></span>
+      <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
+    </a></li>
+
+    <li><a class="link" href="https://dreamstodone.etsy.com" target="_blank" rel="noopener">
+      <span class="dot violet" aria-hidden="true">&#9989;</span>
+      <span class="txt"><span class="t">ADHD Friendly Task Tracker</span><span class="n">Sort the list by the energy you actually have</span></span>
+      <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
+    </a></li>
+
+    <li><a class="link" href="https://dreamstodone.etsy.com" target="_blank" rel="noopener">
+      <span class="dot pink" aria-hidden="true">&#128214;</span>
+      <span class="txt"><span class="t">Digital Daily Diary</span><span class="n">A calm page for the day, kept on your device</span></span>
+      <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
+    </a></li>
+
+  </ul>
+
+  <footer>
+    <p>Every tool lives in my shop at <a id="footShop" href="https://dreamstodone.etsy.com" target="_blank" rel="noopener">dreamstodone.etsy.com</a></p>
+  </footer>
+
+</div>
+
+<div class="shopbar">
+  <a id="shopBar" href="https://dreamstodone.etsy.com" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+    Shop all the planners
+  </a>
+</div>
+
+<script>
+/* ===========================================================
+   SETTINGS
+   =========================================================== */
+var SHOP_URL = "https://dreamstodone.etsy.com";
+
+// ONE FORM PER PLANNER. In Kit (or Mailchimp) make a separate form for
+// each giveaway and attach that planner's file to it, then paste each
+// form's action URL here. The keys must match the radio value="" above.
+// If you would rather run a single form for both, fill in FALLBACK only.
+var FORM_ACTIONS = {
+  "Gamified Chores Tracker": "",
+  "Student Planner": ""
+};
+var FALLBACK_ACTION = "";
+
+var EMAIL_FIELD_NAME  = "email_address";   // Kit: email_address   Mailchimp: EMAIL
+var GIFT_FIELD_NAME   = "fields[gift]";    // records which planner they chose
+var CONSENT_FIELD_NAME= "fields[consent]";
+/* =========================================================== */
+
+(function () {
+  "use strict";
+
+  var NAMES = { tt:"tiktok", yt:"youtube", ig:"instagram", pin:"pinterest", em:"email" };
+  var raw = "";
+  try {
+    raw = (location.search.match(/[?&]s=([^&#]*)/) || [])[1] || "";
+    raw = decodeURIComponent(raw);
+  } catch (e) {}
+  var source = NAMES[raw] || raw || "linkpage";
+
+  function tag(url) {
+    if (!url) url = SHOP_URL;
+    var hash = "", q;
+    var h = url.indexOf("#");
+    if (h > -1) { hash = url.slice(h); url = url.slice(0, h); }
+    q = url.indexOf("?") > -1 ? "&" : "?";
+    return url + q + "utm_source=" + encodeURIComponent(source)
+               + "&utm_medium=social&utm_campaign=linkpage" + hash;
+  }
+
+  var links = document.querySelectorAll("a.link, #footShop, #shopBar");
+  for (var i = 0; i < links.length; i++) {
+    links[i].setAttribute("href", tag(links[i].getAttribute("href")));
+  }
+
+  var give    = document.getElementById("give");
+  var form    = document.getElementById("giveForm");
+  var input   = document.getElementById("email");
+  var consent = document.getElementById("consent");
+  var consentRow = document.getElementById("consentRow");
+
+  function note(text) {
+    var n = give.querySelector(".formnote");
+    if (!n) {
+      n = document.createElement("p");
+      n.className = "formnote";
+      form.parentNode.insertBefore(n, form.nextSibling);
+    }
+    n.textContent = text;
+  }
+
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+
+    var value = (input.value || "").replace(/^\s+|\s+$/g, "");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)) {
+      input.className = "bad";
+      input.focus();
+      return;
+    }
+    input.className = "";
+
+    if (!consent.checked) {
+      consentRow.className = "consent bad";
+      note("Please tick the box so I am allowed to email your planner to you.");
+      consent.focus();
+      return;
+    }
+    consentRow.className = "consent";
+
+    var gift = "";
+    var radios = form.elements["gift"];
+    for (var i = 0; i < radios.length; i++) { if (radios[i].checked) gift = radios[i].value; }
+
+    var action = FORM_ACTIONS[gift] || FALLBACK_ACTION;
+    if (!action) {
+      note("Not connected to an email provider yet. Paste the form action URL for “" + gift + "” into FORM_ACTIONS.");
+      return;
+    }
+
+    var sink = document.createElement("iframe");
+    sink.name = "dtd_sink";
+    sink.setAttribute("aria-hidden", "true");
+    sink.style.display = "none";
+    document.body.appendChild(sink);
+
+    var post = document.createElement("form");
+    post.method = "POST";
+    post.action = action;
+    post.target = "dtd_sink";
+    post.style.display = "none";
+
+    function hidden(name, val) {
+      var f = document.createElement("input");
+      f.type = "hidden"; f.name = name; f.value = val;
+      post.appendChild(f);
+    }
+    hidden(EMAIL_FIELD_NAME, value);
+    hidden(GIFT_FIELD_NAME, gift);
+    hidden(CONSENT_FIELD_NAME, "yes");
+    hidden("fields[source]", source);
+
+    document.body.appendChild(post);
+    post.submit();
+
+    give.className = "give sent";
+    try { localStorage.setItem("dtd-link-signed", gift); } catch (e) {}
+  });
+
+  /* light and dark */
+  var root = document.documentElement;
+  var KEY  = "dtd-linkpage-theme";
+  try {
+    var saved = localStorage.getItem(KEY);
+    if (saved === "dark" || saved === "light") root.setAttribute("data-theme", saved);
+  } catch (e) {}
+  function syncMeta() {
+    var m = document.querySelector('meta[name="theme-color"]');
+    if (m) m.setAttribute("content", root.getAttribute("data-theme") === "dark" ? "#15121D" : "#F7F1E7");
+  }
+  syncMeta();
+  document.getElementById("themeBtn").addEventListener("click", function () {
+    var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    syncMeta();
+    try { localStorage.setItem(KEY, next); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>
